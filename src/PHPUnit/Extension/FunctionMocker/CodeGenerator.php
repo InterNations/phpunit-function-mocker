@@ -32,7 +32,8 @@ EOS;
         eval($code);
     }
 
-    public static function generateConstant(string $namespace, string $constant, mixed $value): string
+    /** @param mixed $value */
+    public static function generateConstant(string $namespace, string $constant, $value): string
     {
         $template = <<<'EOS'
 namespace {namespace}

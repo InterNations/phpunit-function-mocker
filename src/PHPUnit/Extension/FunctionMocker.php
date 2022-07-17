@@ -55,7 +55,8 @@ class FunctionMocker
         return $this;
     }
 
-    public function mockConstant(string $constant, mixed $value): self
+    /** @param mixed $value */
+    public function mockConstant(string $constant, $value): self
     {
         $this->constants[trim($constant)] = $value;
 

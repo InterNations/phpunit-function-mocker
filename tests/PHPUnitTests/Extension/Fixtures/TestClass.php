@@ -3,7 +3,8 @@ namespace PHPUnitTests\Extension\Fixtures;
 
 class TestClass
 {
-    public static function invokeGlobalFunction(): string|int
+    /** @return string|int */
+    public static function invokeGlobalFunction()
     {
         return strpos('ffoo', 'o');
     }
