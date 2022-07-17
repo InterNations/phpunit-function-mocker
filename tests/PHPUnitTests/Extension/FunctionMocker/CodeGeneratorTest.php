@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 class CodeGeneratorTest extends TestCase
 {
-    public function testGenerateFunctionMock()
+    public function testGenerateFunctionMock(): void
     {
         $code = CodeGenerator::generateFunction('Test\Namespace', 'strlen');
 
@@ -23,10 +23,11 @@ namespace Test\Namespace
     }
 }
 EOS;
+
         self::assertSame($expected, $code);
     }
 
-    public function testGenerateStringConstantMock()
+    public function testGenerateStringConstantMock(): void
     {
         $code = CodeGenerator::generateConstant('Test\Namespace', 'CONSTANT', 'value');
 
@@ -36,10 +37,17 @@ namespace Test\Namespace
     if (!defined(__NAMESPACE__ . '\\CONSTANT')) {
         define(__NAMESPACE__ . '\\CONSTANT', 'value');
     } elseif (CONSTANT !== 'value') {
-        throw new \RuntimeException(sprintf('Cannot redeclare constant "CONSTANT" in namespace "%s". Already defined as "%s"', __NAMESPACE__, 'value'));
+        throw new \RuntimeException(
+            sprintf(
+                'Cannot redeclare constant "CONSTANT" in namespace "%s". Already defined as "%s"',
+                __NAMESPACE__,
+                'value'
+            )
+        );
     }
 }
 EOS;
+
         self::assertSame($expected, $code);
     }
 
@@ -53,10 +61,17 @@ namespace Test\Namespace
     if (!defined(__NAMESPACE__ . '\\CONSTANT')) {
         define(__NAMESPACE__ . '\\CONSTANT', 123);
     } elseif (CONSTANT !== 123) {
-        throw new \RuntimeException(sprintf('Cannot redeclare constant "CONSTANT" in namespace "%s". Already defined as "%s"', __NAMESPACE__, 123));
+        throw new \RuntimeException(
+            sprintf(
+                'Cannot redeclare constant "CONSTANT" in namespace "%s". Already defined as "%s"',
+                __NAMESPACE__,
+                123
+            )
+        );
     }
 }
 EOS;
+
         self::assertSame($expected, $code);
     }
 }
