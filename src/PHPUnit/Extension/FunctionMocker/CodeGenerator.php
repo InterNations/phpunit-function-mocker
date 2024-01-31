@@ -32,7 +32,8 @@ EOS;
         eval($code);
     }
 
-    public static function generateConstant($namespace, $constant, $value)
+    /** @param mixed $value */
+    public static function generateConstant(string $namespace, string $constant, $value): string
     {
         $template = <<<'EOS'
 namespace {namespace}
@@ -40,7 +41,13 @@ namespace {namespace}
     if (!defined(__NAMESPACE__ . '\\{constant}')) {
         define(__NAMESPACE__ . '\\{constant}', {value});
     } elseif ({constant} !== {value}) {
-        throw new \RuntimeException(sprintf('Cannot redeclare constant "{constant}" in namespace "%s". Already defined as "%s"', __NAMESPACE__, {value}));
+        throw new \RuntimeException(
+            sprintf(
+                'Cannot redeclare constant "{constant}" in namespace "%s". Already defined as "%s"',
+                __NAMESPACE__,
+                {value}
+            )
+        );
     }
 }
 EOS;
@@ -60,15 +67,14 @@ EOS;
         eval(self::generateConstant($namespace, $name, $value));
     }
 
+    /** @param string[] $parameters */
     private static function renderTemplate(string $template, array $parameters): string
     {
         return strtr(
             $template,
             array_combine(
                 array_map(
-                    function (string $key): string {
-                        return '{' . $key . '}';
-                    },
+                    fn(string $key): string => '{' . $key . '}',
                     array_keys($parameters)
                 ),
                 array_values($parameters)

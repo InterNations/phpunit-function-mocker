@@ -9,22 +9,19 @@ use function random_bytes;
 
 class FunctionMocker
 {
-    /** @var TestCase */
-    private $testCase;
+    private TestCase $testCase;
+    private string $namespace;
 
-    /** @var string */
-    private $namespace;
+    /** @var string[] */
+    private array $functions = [];
 
-    /** @var array */
-    private $functions = array();
+    /** @var string[] */
+    private array $constants = [];
 
-    /** @var array */
-    private $constants = [];
+    /** @var string[] */
+    private static $mockedFunctions = [];
 
-    /** @var array */
-    private static $mockedFunctions = array();
-
-    private function __construct(TestCase $testCase, $namespace)
+    private function __construct(TestCase $testCase, string $namespace)
     {
         $this->testCase = $testCase;
         $this->namespace = trim($namespace, '\\');
@@ -35,7 +32,7 @@ class FunctionMocker
      *
      * Example: PHP global namespace function setcookie() needs to be overridden in order to test
      * if a cookie gets set. When setcookie() is called from inside a class in the namespace
-     * \Foo\Bar the mock setcookie() created here will be used instead to the real function.
+     * \Foo\Bar the mock setcookie() created here will be used instead of the real function.
      */
     public static function start(TestCase $testCase, string $namespace): self
     {
@@ -58,6 +55,7 @@ class FunctionMocker
         return $this;
     }
 
+    /** @param mixed $value */
     public function mockConstant(string $constant, $value): self
     {
         $this->constants[trim($constant)] = $value;
@@ -68,7 +66,7 @@ class FunctionMocker
     public function getMock(): MockObject
     {
         $mock = $this->testCase->getMockBuilder('stdClass')
-            ->setMethods($this->functions)
+            ->addMethods($this->functions)
             ->setMockClassName('PHPUnit_Extension_FunctionMocker_' . bin2hex(random_bytes(16)))
             ->getMock();
 
@@ -78,6 +76,7 @@ class FunctionMocker
 
         foreach ($this->functions as $function) {
             $fqFunction = $this->namespace . '\\' . $function;
+
             if (in_array($fqFunction, static::$mockedFunctions, true)) {
                 continue;
             }
@@ -87,7 +86,7 @@ class FunctionMocker
         }
 
         if (!isset($GLOBALS['__PHPUNIT_EXTENSION_FUNCTIONMOCKER'])) {
-            $GLOBALS['__PHPUNIT_EXTENSION_FUNCTIONMOCKER'] = array();
+            $GLOBALS['__PHPUNIT_EXTENSION_FUNCTIONMOCKER'] = [];
         }
 
         $GLOBALS['__PHPUNIT_EXTENSION_FUNCTIONMOCKER'][$this->namespace] = $mock;
